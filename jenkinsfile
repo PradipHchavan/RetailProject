@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         LABS = credentials('labcreds')
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+        JAVA_HOME = '/opt/java/openjdk'
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
     
@@ -36,23 +36,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                sh '''
-                echo "JAVA_HOME=$JAVA_HOME"
-
-                which java || true
-
-                java -version || true
-
-                ls -l /usr/lib/jvm || true
-
-                find / -name java 2>/dev/null | head -20
-
-                pipenv run pytest
-                '''
-            }
-        }
+        
         
 
         stage('Test') {
