@@ -4,21 +4,30 @@ pipeline {
     environment {
         LABS = credentials('labcreds')
         JAVA_HOME = '/opt/bitnami/java'
-        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+        PATH = "${env.JAVA_HOME}/bin:/root/.local/bin:${env.PATH}"
     }
     
     stages {
+
+        stage('Verify Environment') {
+            steps {
+                script {
+                    sh 'python3 --version'
+                    sh 'pip3 --version'
+                    sh 'pipenv --version'
+                    sh 'echo $PATH'
+                }
+            }
+        }
+
         stage('Setup Virtual Environment') {
             steps {
                 script {
                     // Create virtual environment
                     sh 'python3 -m venv retail_pipeline_venv'
 
-                    // Upgrade pip inside virtual environment
+                    // Upgrade pip inside venv
                     sh './retail_pipeline_venv/bin/pip install --upgrade pip'
-
-                    // Verify pipenv installation
-                    sh '/home/pradipchavan99000/.local/bin/pipenv --version'
                 }
             }
         }
@@ -26,8 +35,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install dependencies using pipenv
-                    sh '/home/pradipchavan99000/.local/bin/pipenv install'
+                    // Install project dependencies
+                    sh 'pipenv install'
                 }
             }
         }
@@ -40,7 +49,7 @@ pipeline {
                     sh 'echo $PATH'
 
                     // Run tests
-                    sh '/home/pradipchavan99000/.local/bin/pipenv run pytest'
+                    sh 'pipenv run pytest'
                 }
             }
         }
