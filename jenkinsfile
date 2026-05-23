@@ -56,6 +56,21 @@ pipeline {
             }
         }
 
+
+        stage('Debug Java') {
+            steps {
+                sh '''
+                echo "JAVA_HOME=$JAVA_HOME"
+
+                which java || true
+
+                java -version || true
+
+                find / -name java 2>/dev/null | head -20
+                '''
+            }
+        }
+
         stage('Test') {
             steps {
                 script {
