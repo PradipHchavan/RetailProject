@@ -64,11 +64,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    scp -v \
-                    -i /var/jenkins_home/.ssh/id_rsa \
-                    -o StrictHostKeyChecking=no \
-                    /tmp/retailproject.tar.gz \
-                    itv024730@g02.itversity.com:/home/itv024730/retailproject/retailproject.tar.gz
+                        export HOME=/var/jenkins_home
+
+                        scp \
+                        -i /var/jenkins_home/.ssh/id_rsa \
+                        -o StrictHostKeyChecking=no \
+                        /tmp/retailproject.tar.gz \
+                        itv024730@g02.itversity.com:/home/itv024730/retailproject/retailproject.tar.gz
                     '''
             }
         }
