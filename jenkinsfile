@@ -64,6 +64,8 @@ pipeline {
         stage('Deploy') {
             steps {
             sh '''
+                    export HOME=/var/jenkins_home
+
                     scp -o StrictHostKeyChecking=no \
                     /tmp/retailproject.tar.gz \
                     itv024730@g02.itversity.com:/home/itv024730/retailproject/retailproject.tar.gz
