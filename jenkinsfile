@@ -51,7 +51,13 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh 'tar --exclude="retail_pipeline_venv" -czf retailproject.tar.gz .'
+                sh '''
+                    tar \
+                    --exclude='retail_pipeline_venv' \
+                    --exclude='.git' \
+                    --exclude='*.pyc' \
+                    -czf /tmp/retailproject.tar.gz .
+                    '''
             }
         }
 
