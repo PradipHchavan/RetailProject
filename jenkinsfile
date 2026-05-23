@@ -64,6 +64,17 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
+                    echo "HOME=$HOME"
+                    whoami
+
+                    ls -la ~/.ssh || true
+                    ls -la /var/jenkins_home/.ssh || true
+
+                    ssh -v -o StrictHostKeyChecking=no \
+                    itv024730@g02.itversity.com exit || true
+                    '''
+                    
+                sh '''
                     scp -o StrictHostKeyChecking=no \
                     retailproject.tar.gz \
                     itv024730@g02.itversity.com:/home/itv024730/retailproject
