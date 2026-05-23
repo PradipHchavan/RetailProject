@@ -51,7 +51,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh 'zip -r retailproject.zip . -x "retail_pipeline_venv/*"'
+                sh 'tar --exclude="retail_pipeline_venv" -czf retailproject.tar.gz .'
             }
         }
 
