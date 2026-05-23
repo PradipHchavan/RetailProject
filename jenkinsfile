@@ -63,11 +63,27 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent(credentials: ['itversity-ssh']) {
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'itversity-ssh',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )
+                ]) {
                     sh '''
-                        scp -o StrictHostKeyChecking=no \
+                        echo "Starting deploy stage"
+
+                        echo "SSH_USER=$SSH_USER"
+
+                        ls -l $SSH_KEY || true
+
+                        ls -l /tmp/retailproject.tar.gz || true
+
+                        scp -v \
+                        -i $SSH_KEY \
+                        -o StrictHostKeyChecking=no \
                         /tmp/retailproject.tar.gz \
-                        itv024730@g02.itversity.com:/home/itv024730/retailproject/retailproject.tar.gz
+                        $SSH_USER@g02.itversity.com:/home/$SSH_USER/retailproject/retailproject.tar.gz
                     '''
                 }
             }
