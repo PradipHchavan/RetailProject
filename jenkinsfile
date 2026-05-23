@@ -1,27 +1,92 @@
 pipeline {
     agent any
-
+    
+    environment {
+        LABS = credentials('labcreds')
+        JAVA_HOME = '/opt/java/openjdk'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+    }
+    
     stages {
-        stage('Build') {
+
+        stage('Verify Environment') {
             steps {
-               echo "build completed successfully"
+                script {
+                    sh 'python3 --version'
+                    sh 'pip3 --version'
+                    sh 'pipenv --version'
+                }
             }
         }
+
+        stage('Setup Virtual Environment') {
+            steps {
+                script {
+                    sh 'python3 -m venv retail_pipeline_venv'
+                    sh './retail_pipeline_venv/bin/pip install --upgrade pip'
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh 'pipenv install'
+                }
+            }
+        }
+
+        
+        
+
         stage('Test') {
             steps {
-               echo "test completed successfully"
+                script {
+                    sh 'echo $JAVA_HOME'
+                    sh 'echo $PATH'
+                    sh 'pipenv run pytest'
+                }
             }
         }
+
         stage('Package') {
             steps {
-               echo "package completed successfully"
+                sh '''
+                    tar \
+                    --exclude='retail_pipeline_venv' \
+                    --exclude='.git' \
+                    --exclude='*.pyc' \
+                    -czf /tmp/retailproject.tar.gz .
+                    '''
             }
         }
+
         stage('Deploy') {
             steps {
-               echo "deploy completed successfully"
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'itversity-ssh',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )
+                ]) {
+                    sh '''
+                        echo "Starting deploy stage"
+
+                        echo "SSH_USER=$SSH_USER"
+
+                        ls -l $SSH_KEY || true
+
+                        ls -l /tmp/retailproject.tar.gz || true
+
+                        scp -v \
+                        -i $SSH_KEY \
+                        -o StrictHostKeyChecking=no \
+                        /tmp/retailproject.tar.gz \
+                        $SSH_USER@g02.itversity.com:/home/$SSH_USER/retailproject/retailproject.tar.gz
+                    '''
+                }
             }
         }
-  
     }
 }
