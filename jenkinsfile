@@ -36,6 +36,26 @@ pipeline {
             }
         }
 
+        stage('Debug Java') {
+            steps {
+                sh '''
+                echo "JAVA_HOME=$JAVA_HOME"
+
+                which java || true
+
+                java -version || true
+
+                ls -l /usr/lib/jvm || true
+
+                ls -l /usr/lib/jvm/java-17-openjdk-amd64 || true
+
+                ls -l /usr/lib/jvm/java-17-openjdk-amd64/bin || true
+
+                ls -l /usr/lib/jvm/java-17-openjdk-amd64/bin/java || true
+                '''
+            }
+        }
+
         stage('Test') {
             steps {
                 script {
