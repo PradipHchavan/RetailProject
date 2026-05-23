@@ -36,8 +36,7 @@ pipeline {
             }
         }
 
-
-        stage('Debug Java') {
+        stage('Run Tests') {
             steps {
                 sh '''
                 echo "JAVA_HOME=$JAVA_HOME"
@@ -46,10 +45,15 @@ pipeline {
 
                 java -version || true
 
+                ls -l /usr/lib/jvm || true
+
                 find / -name java 2>/dev/null | head -20
+
+                pipenv run pytest
                 '''
             }
         }
+        
 
         stage('Test') {
             steps {
